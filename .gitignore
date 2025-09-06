@@ -1,0 +1,11 @@
+# Folder dependensi
+node_modules
+
+# File kredensial + sesi Baileys
+baileys_auth_info/
+
+# File private
+.env
+
+# Temporary
+temp/
