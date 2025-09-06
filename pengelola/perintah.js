@@ -13,6 +13,7 @@ const {
     dapatkanRingkasanWikipedia
 } = require('../fitur/utilitas');
 const { mulaiSesiFessage } = require('../fitur/fessage');
+const { tanganiPermintaanMedia } = require('../fitur/alat_media');
 
 async function tanganiPerintah(sock, msg) {
     const jid = msg.key.remoteJid;
@@ -22,23 +23,95 @@ async function tanganiPerintah(sock, msg) {
 
     try {
         switch (command) {
-            case '/menu':
-                await sock.sendMessage(jid, {
-                    text: `📋 *Daftar Perintah idanBot:*
-1. */ai [pertanyaan]* — Tanya apa saja ke AI (gunakan !pikir di depan untuk mode kritis)
-2. */menu* — Menampilkan daftar command
-3. */stiker* — Balas gambar/video untuk jadi stiker
-4. */stikertext [teks]* — Buat stiker dari teks
-5. */hitung [ekspresi]* — Kalkulator
-6. */ytmp3 [url]* — Download audio dari YouTube
-7. */qrcode [teks]* — Buat QR code dari teks
-8. */sholat [kota]* — Jadwal shalat
-9. */tiktok [url]* — Download video TikTok tanpa watermark
-10. */cuaca [kota]* — Informasi cuaca terkini
-11. */wiki [topik]* — Ringkasan dari Wikipedia
-12. */fessage (nomor) | (nama) | (pesan)* — Kirim pesan rahasia`
-                });
+            case '/menu': {
+                const namaPengguna = msg.pushName || "Pengguna";
+                const tanggalSekarang = new Date();
+                const zonaWaktu = 'Asia/Jakarta';
+
+                const opsiTanggal = {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    timeZone: zonaWaktu
+                };
+
+                const opsiWaktu = {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                    timeZone: zonaWaktu
+                };
+
+                const hariTanggal = tanggalSekarang.toLocaleString('id-ID', opsiTanggal);
+                const waktu = tanggalSekarang.toLocaleString('id-ID', opsiWaktu).replace(/\./g, ':');
+                const menuTeks = `
+╭─╸「 *IDAN-BOT* 」
+┃
+┃✦ *Halo, ${namaPengguna}!*
+┃   Selamat datang di menu utama.
+┃
+├─╸「 *INFORMASI* 」
+┃
+┃➤ *Hari:* ${hariTanggal}
+┃➤ *Waktu:* ${waktu} WIB
+┃
+╰─╸「 *© 2025 Wildan* 」
+
+╭─╸「 *DAFTAR PERINTAH* 」
+┃
+├─╸「 🧠 *AI & Kreativitas* 」
+┃
+┃   */ai [pertanyaan]*
+┃   ↳ Tanya apa saja ke AI.
+┃
+┃   */stiker [reply media]*
+┃   ↳ Buat stiker dari gambar/video.
+┃
+┃   */stikertext [teks]*
+┃   ↳ Buat stiker dari tulisan.
+┃
+├─╸「 🖼️ *Media & Unduhan* 」
+┃
+┃   */ytmp3 [url youtube]*
+┃   ↳ Download audio dari YouTube.
+┃
+┃   */tiktok [url tiktok]*
+┃   ↳ Download video TikTok WM.
+┃
+┃   */kompres [reply media]*
+┃   ↳ Kompres gambar/video.
+┃
+┃   */upreso [reply gambar]*
+┃   ↳ Upscale gambar.
+┃
+├─╸「 ⚙️ *Utilitas & Info* 」
+┃
+┃   */hitung [ekspresi]*
+┃   ↳ Kalkulator matematika.
+┃
+┃   */qrcode [teks]*
+┃   ↳ Buat kode QR dari teks.
+┃
+┃   */sholat [nama kota]*
+┃   ↳ Info jadwal sholat.
+┃
+┃   */cuaca [nama kota]*
+┃   ↳ Informasi cuaca terkini.
+┃
+┃   */wiki [topik]*
+┃   ↳ Cari ringkasan Wikipedia.
+┃
+├─╸「 💌 *Rahasia* 」
+┃
+┃   */fessage [no|nama|pesan]*
+┃   ↳ Kirim pesan anonim.
+┃
+╰─╸「 *Gunakan perintah tanpa tanda [ ]* 」
+`;
+                await sock.sendMessage(jid, { text: menuTeks.trim() });
                 break;
+            }
             case '/hitung':
                 await hitungKalkulator(sock, msg, args);
                 break;
@@ -68,6 +141,12 @@ async function tanganiPerintah(sock, msg) {
                 break;
             case '/fessage':
                 await mulaiSesiFessage(sock, msg);
+                break;
+            case '/kompres':
+                await tanganiPermintaanMedia(sock, msg, 'kompres');
+                break;
+            case '/upreso':
+                await tanganiPermintaanMedia(sock, msg, 'upreso');
                 break;
             default:
                 await sock.sendMessage(jid, { text: "Command tidak dikenali. Ketik /menu untuk melihat semua perintah." }, { quoted: msg });

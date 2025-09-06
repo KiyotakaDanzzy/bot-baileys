@@ -17,14 +17,14 @@ async function tanganiKueriAi(sock, msg) {
         return sock.sendMessage(jid, { text: "Berikan pertanyaan setelah command /ai.\nContoh: `/ai jelaskan apa itu partikel Tuhan?`" }, { quoted: msg });
     }
 
-    await sock.sendMessage(jid, { text: "🤖 Sedang memproses permintaan AI..." });
+    await sock.sendMessage(jid, { text: "Sedang memproses permintaan AI..." });
 
     try {
         let modelFinal;
 
         if (paksaKritis) {
             modelFinal = MODEL_CRITICAL;
-            await sock.sendMessage(jid, { text: `Mode Kritis dipaksa aktif (!pikir). Menggunakan model: *${modelFinal}*` });
+            await sock.sendMessage(jid, { text: `Mode Kritis aktif (!pikir). Menggunakan model: *${modelFinal}*` });
         } else {
             const routerPrompt = `Anda adalah AI classifier. Klasifikasikan intensi dari prompt berikut sebagai 'CASUAL' atau 'CRITICAL'. Jawab HANYA dengan satu kata. Prompt: "${kueri}"`;
             const routerResponse = await axios.post("https://openrouter.ai/api/v1/chat/completions", {

@@ -75,7 +75,7 @@ async function unduhAudioYouTube(sock, msg, url) {
     if (!url) return sock.sendMessage(jid, { text: "Format: /ytmp3 [url_youtube]" }, { quoted: msg });
     let outputTemplate = '';
     try {
-        await sock.sendMessage(jid, { text: "⏳ Memproses link YouTube..." });
+        await sock.sendMessage(jid, { text: "Memproses link YouTube..." });
         const ytDlpPath = path.resolve(__dirname, '..', 'bin', 'yt-dlp.exe');
         const ffmpegPath = path.resolve(__dirname, '..', 'bin', 'ffmpeg.exe');
 

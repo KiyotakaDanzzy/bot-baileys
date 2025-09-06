@@ -2,6 +2,7 @@
 const { tanganiPerintah } = require('./perintah');
 const { tanganiKueriAi } = require('../fitur/ai');
 const { bacaDb, tanganiPesanSesi } = require('../fitur/fessage');
+const { sesiAktif, prosesPilihanMedia } = require('../fitur/alat_media');
 
 async function tanganiPesanMasuk(sock, m) {
     const msg = m.messages[0];
@@ -9,14 +10,19 @@ async function tanganiPesanMasuk(sock, m) {
 
     const jid = msg.key.remoteJid;
     const body = (msg.message.conversation || msg.message.extendedTextMessage?.text || '').trim();
-    if (!body) return;
+    if (!body && !msg.message.imageMessage && !msg.message.videoMessage) return;
 
     const db = bacaDb();
     const partnerJid = db[jid];
 
     if (partnerJid) {
         await tanganiPesanSesi(sock, msg, partnerJid, db);
-        return; // batal ketika dalam sesi
+        return;
+    }
+
+    if (sesiAktif[jid] && /^\d+$/.test(body)) {
+        await prosesPilihanMedia(sock, msg);
+        return;
     }
 
     const isGroup = jid.endsWith('@g.us');
@@ -37,12 +43,19 @@ async function tanganiPesanMasuk(sock, m) {
     };
 
     if (isGroup) {
-        if (!isCommand) return; // hanya proses command di grup
+        if (!isCommand) return;
         try {
-            // cek admin
-            const botJid = sock.user?.id?.split(':')[0] + '@s.whatsapp.net';
+            // console.log("data user: ", sock.user);
+
+            const botIdForComparison = sock.user.lid.split(':')[0] + '@lid';
+            // console.log("id bot:", botIdForComparison);
+
             const groupMeta = await sock.groupMetadata(jid);
-            const botParticipant = groupMeta.participants.find(p => p.id === botJid);
+            // console.log("metadata grup: ", groupMeta);
+
+            const botParticipant = groupMeta.participants.find(p => p.id === botIdForComparison);
+            // console.log("posisi bot: ", botParticipant);
+
             if (botParticipant?.admin) {
                 await prosesPerintah();
             } else {
@@ -55,7 +68,9 @@ async function tanganiPesanMasuk(sock, m) {
         if (isCommand) {
             await prosesPerintah();
         } else {
-            await sock.sendMessage(jid, { text: "Perintah tidak dikenali. Silakan gunakan command yang valid.\n\nKetik */menu* untuk melihat daftar perintah." }, { quoted: msg });
+            if (!sesiAktif[jid]) {
+                await sock.sendMessage(jid, { text: "Perintah tidak dikenali. Silakan gunakan command yang valid.\n\nKetik */menu* untuk melihat daftar perintah." }, { quoted: msg });
+            }
         }
     }
 }
