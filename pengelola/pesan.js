@@ -45,27 +45,18 @@ async function tanganiPesanMasuk(sock, m) {
     if (isGroup) {
         if (!isCommand) return;
         try {
-            if (!sock.user) {
-                console.log("Menerima pesan grup tetapi bot belum siap, mengabaikan...");
-                return;
-            }
-
-            const botJid = sock.user.id ? sock.user.id.split(':')[0] + '@s.whatsapp.net' : null;
-            const botLid = sock.user.lid ? sock.user.lid.split(':')[0] + '@lid' : null;
-
-            if (!botJid && !botLid) {
-                console.log("Tidak menemukan ID bot, mengabaikan pesan grup...");
+            if (!sock.user?.id) {
+                console.log("Menerima pesan grup tetapi ID bot belum siap, mengabaikan...");
                 return;
             }
 
             const groupMeta = await sock.groupMetadata(jid);
-            const botParticipant = groupMeta.participants.find(p => p.id === botJid || p.id === botLid);
+            const botJid = sock.user.id.split(':')[0] + '@s.whatsapp.net';
 
-            // console.log("--- debug admin ---");
-            // console.log("cari bot JID:", botJid);
-            // console.log("cari bot LID:", botLid);
-            // console.log("posisi bot:", botParticipant);
-            // console.log("--- end debug ---");
+            const botParticipant = groupMeta.participants.find(p => {
+                const participantJid = p.id.split(':')[0] + '@s.whatsapp.net';
+                return participantJid === botJid;
+            });
 
             if (botParticipant?.admin) {
                 await prosesPerintah();
