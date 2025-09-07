@@ -54,7 +54,7 @@ async function tanganiPesanMasuk(sock, m) {
             const botLid = sock.user.lid ? sock.user.lid.split(':')[0] + '@lid' : null;
 
             if (!botJid && !botLid) {
-                console.log("Tidak dapat menemukan ID bot, mengabaikan pesan grup...");
+                console.log("Tidak menemukan ID bot, mengabaikan pesan grup...");
                 return;
             }
 
