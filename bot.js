@@ -11,13 +11,13 @@ const qrcode = require('qrcode-terminal');
 const { tanganiPesanMasuk } = require('./pengelola/pesan');
 const express = require('express');
 const app = express();
-const port = 3000;
+const port = 5000;
 
 app.get('/', (req, res) => {
     res.send('Bot Aktif!');
 });
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
     console.log(`Server web berjalan di port ${port}`);
 });
 
