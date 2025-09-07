@@ -9,6 +9,17 @@ const { Boom } = require('@hapi/boom');
 const pino = require('pino');
 const qrcode = require('qrcode-terminal');
 const { tanganiPesanMasuk } = require('./pengelola/pesan');
+const express = require('express');
+const app = express();
+const port = 3000;
+
+app.get('/', (req, res) => {
+    res.send('Bot Aktif!');
+});
+
+app.listen(port, () => {
+    console.log(`Server web berjalan di port ${port}`);
+});
 
 async function hubungkanKeWhatsApp() {
     const { state, saveCreds } = await useMultiFileAuthState('baileys_auth_info');

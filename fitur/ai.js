@@ -53,7 +53,7 @@ async function tanganiKueriAi(sock, msg) {
         }, {
             headers: {
                 'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-                'HTTP-Referer': 'https://github.com/wyldnc/idannbot',
+                'HTTP-Referer': 'https://github.com/KiyotakaDanzzy/bot-baileys',
                 'X-Title': 'idanBot'
             }
         });
