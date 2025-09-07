@@ -48,7 +48,7 @@ async function tanganiPerintah(sock, msg) {
                 const menuTeks = `
 ╭─╸「 *IDAN-BOT* 」
 ┃
-┃✦ *Halo, ${namaPengguna}!*
+┃✦ *Halo, @${namaPengguna}!*
 ┃   Selamat datang di menu utama.
 ┃
 ├─╸「 *INFORMASI* 」
@@ -77,7 +77,7 @@ async function tanganiPerintah(sock, msg) {
 ┃   ↳ Download audio dari YouTube.
 ┃
 ┃   */tiktok [url tiktok]*
-┃   ↳ Download video TikTok WM.
+┃   ↳ Download video TikTok no WM
 ┃
 ┃   */kompres [reply media]*
 ┃   ↳ Kompres gambar/video.
