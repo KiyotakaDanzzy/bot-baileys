@@ -54,11 +54,16 @@ async function tanganiPesanMasuk(sock, m) {
             const botJid = sock.user.id.split(':')[0] + '@s.whatsapp.net';
 
             const botParticipant = groupMeta.participants.find(p => {
+                // Try exact match first
+                if (p.id === sock.user.id) return true;
+                // Try without resource part
                 const participantJid = p.id.split(':')[0] + '@s.whatsapp.net';
                 return participantJid === botJid;
             });
 
-            if (botParticipant?.admin) {
+            console.log(`Debug - Bot JID: ${botJid}, Participant found: ${botParticipant ? 'Ya' : 'Tidak'}, Admin status: ${botParticipant?.admin}`);
+
+            if (botParticipant && (botParticipant.admin === 'admin' || botParticipant.admin === 'superAdmin')) {
                 await prosesPerintah();
             } else {
                 console.log(`Bot bukan admin di grup "${groupMeta.subject}", command diabaikan.`);
