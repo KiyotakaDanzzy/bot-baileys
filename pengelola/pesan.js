@@ -53,6 +53,13 @@ async function tanganiPesanMasuk(sock, m) {
             const groupMeta = await sock.groupMetadata(jid);
             const botJid = sock.user.id.split(':')[0] + '@s.whatsapp.net';
 
+            console.log(`Debug - sock.user.id: ${sock.user.id}`);
+            console.log(`Debug - Bot JID yang dicari: ${botJid}`);
+            console.log(`Debug - Participant IDs dalam grup:`);
+            groupMeta.participants.forEach((p, index) => {
+                console.log(`  ${index + 1}. ${p.id} (admin: ${p.admin || 'tidak'})`);
+            });
+
             const botParticipant = groupMeta.participants.find(p => {
                 // Try exact match first
                 if (p.id === sock.user.id) return true;
