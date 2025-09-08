@@ -51,29 +51,40 @@ async function tanganiPesanMasuk(sock, m) {
             }
 
             const groupMeta = await sock.groupMetadata(jid);
-            const botJid = sock.user.id.split(':')[0] + '@s.whatsapp.net';
+            
+            // Try multiple JID formats to find bot in participants
+            const botJidOptions = [
+                sock.user.id,  // Full ID with resource
+                sock.user.id.split(':')[0] + '@s.whatsapp.net',  // Standard format
+                sock.user.id.split(':')[0] + '@lid',  // LID format
+            ];
 
-            console.log(`Debug - sock.user.id: ${sock.user.id}`);
-            console.log(`Debug - Bot JID yang dicari: ${botJid}`);
-            console.log(`Debug - Participant IDs dalam grup:`);
-            groupMeta.participants.forEach((p, index) => {
-                console.log(`  ${index + 1}. ${p.id} (admin: ${p.admin || 'tidak'})`);
-            });
+            let botParticipant = null;
+            
+            for (const botJid of botJidOptions) {
+                botParticipant = groupMeta.participants.find(p => p.id === botJid);
+                if (botParticipant) {
+                    console.log(`Bot ditemukan dengan format JID: ${botJid}, Admin status: ${botParticipant.admin || 'tidak'}`);
+                    break;
+                }
+            }
 
-            const botParticipant = groupMeta.participants.find(p => {
-                // Try exact match first
-                if (p.id === sock.user.id) return true;
-                // Try without resource part
-                const participantJid = p.id.split(':')[0] + '@s.whatsapp.net';
-                return participantJid === botJid;
-            });
+            if (!botParticipant) {
+                console.log(`Bot tidak ditemukan dalam daftar peserta grup "${groupMeta.subject}". Mungkin bot belum ditambahkan atau dikeluarkan dari grup.`);
+                await sock.sendMessage(jid, { 
+                    text: "Bot tidak ditemukan dalam daftar peserta grup. Pastikan bot sudah ditambahkan ke grup dan memiliki izin yang diperlukan." 
+                });
+                return;
+            }
 
-            console.log(`Debug - Bot JID: ${botJid}, Participant found: ${botParticipant ? 'Ya' : 'Tidak'}, Admin status: ${botParticipant?.admin}`);
+            // Check admin status (admin, superAdmin, or superadmin - case variations)
+            const adminStatus = botParticipant.admin || '';
+            const isAdmin = ['admin', 'superAdmin', 'superadmin'].includes(adminStatus);
 
-            if (botParticipant && (botParticipant.admin === 'admin' || botParticipant.admin === 'superAdmin')) {
+            if (isAdmin) {
                 await prosesPerintah();
             } else {
-                console.log(`Bot bukan admin di grup "${groupMeta.subject}", command diabaikan.`);
+                console.log(`Bot adalah member biasa (bukan admin) di grup "${groupMeta.subject}", command diabaikan.`);
             }
         } catch (e) {
             console.error("Gagal mendapatkan metadata grup:", e);
