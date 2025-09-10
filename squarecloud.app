@@ -1,0 +1,7 @@
+DISPLAY_NAME=Bot Baileys
+
+MAIN=bot.js
+
+MEMORY=100
+
+VERSION=latest
